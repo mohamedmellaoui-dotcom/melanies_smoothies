@@ -3,6 +3,7 @@ import streamlit as st
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col, when_matched
 import requests
+import pandas as pd
 
 st.write("VERSION FINALE OK")
 
@@ -18,6 +19,12 @@ st.write("Create and manage your smoothie orders!")
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON') )
 st.dataframe(data=my_dataframe, use_container_width=True)
 st.stop()
+
+# Convert the snowpark Dataframe to a Pandas so we can use to LOC Function
+pd_pf = my_dataframe.to_pandas()
+st.my_dataframe(pd_pf)
+st.stop()
+
 
 fruit_rows = my_dataframe.collect()
 fruit_list = [row['FRUIT_NAME'] for row in fruit_rows]
