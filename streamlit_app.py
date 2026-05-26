@@ -4,53 +4,44 @@ from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col, when_matched
 import requests
 
-# Debug (pour vérifier que c'est la bonne version)
 st.write("VERSION FINALE OK")
 
-# Create Snowflake session (via Streamlit secrets)
+# Snowflake session
 session = Session.builder.configs(st.secrets["snowflake"]).create()
 
 st.success("Connected to Snowflake!")
 
-# Title
 st.title(f"🥤 Smoothie App - Streamlit {st.__version__}")
 st.write("Create and manage your smoothie orders!")
 
-# Load fruit options
+# Load fruits
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
 
-# Convert Snowpark DataFrame → Python list
 fruit_rows = my_dataframe.collect()
 fruit_list = [row['FRUIT_NAME'] for row in fruit_rows]
 
-# Input: smoothie name
+# Name input
 name_on_order = st.text_input('Name of Smoothie')
 
-# Multiselect fruits
-#ingredients_list = st.multiselect(
-#    "What are your favorite fruits?",
-#    fruit_list,
-#    max_selections=5
-#)
+# MULTISELECT (IMPORTANT)
+ingredients_list = st.multiselect(
+    "What are your favorite fruits?",
+    fruit_list,
+    max_selections=5
+)
 
-# Build ingredients string
-#INGREDIENTS_STRING = ' '.join(ingredients_list)
+# API CALL (une seule fois)
+smoothiefroot_response = requests.get(
+    "https://my.smoothiefroot.com/api/fruit/watermelon"
+)
 
-#
-if ingredients_list:
-    INGREDIENTS_STRING = ''
+st.write("API RESPONSE:")
+st.json(smoothiefroot_response.json())
 
-    for fruit_chosen in ingredients_list:
-        INGREDIENTS_STRING += INGREDIENTS_STRING + ' '
-        #request
-        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
-        #st.text(smoothiefroot_response.json())
-        sf_sd = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+# Build string
+INGREDIENTS_STRING = ' '.join(ingredients_list)
 
-
-
-    
-# Button to insert order
+# INSERT ORDER
 tim_to_insert = st.button('Submit Order')
 
 if tim_to_insert:
@@ -64,19 +55,12 @@ if tim_to_insert:
     else:
         st.warning("Please enter a name and select at least one fruit.")
 
-# =========================
-# UPDATE SECTION (MERGE)
-# =========================
-
+# UPDATE SECTION
 st.subheader("Update Orders")
 
-# Load orders into pandas
 orders_df = session.table("smoothies.public.orders").to_pandas()
-
-# Editable table
 edited_df = st.data_editor(orders_df)
 
-# Update button
 update_button = st.button("Update Orders")
 
 if update_button:
@@ -94,5 +78,3 @@ if update_button:
     )
 
     st.success("Orders updated!", icon="✅")
-
-
