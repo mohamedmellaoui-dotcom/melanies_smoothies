@@ -22,8 +22,8 @@ st.stop()
 
 # Convert the snowpark Dataframe to a Pandas so we can use to LOC Function
 pd_pf = my_dataframe.to_pandas()
-st.my_dataframe(pd_pf)
-st.stop()
+#st.my_dataframe(pd_pf)
+#st.stop()
 
 
 fruit_rows = my_dataframe.collect()
@@ -45,6 +45,9 @@ if ingredients_list:
 
     for fruit_chosen in ingredients_list:
         INGREDIENTS_STRING += fruit_chosen + ' '
+
+        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
+st.write('The search value for ', fruit_chosen,' is ', search_on, '.')
 
         st.subheader(f"{fruit_chosen} Nutrition Informations")
 
