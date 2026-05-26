@@ -9,57 +9,58 @@ st.write("VERSION FINALE OK")
 
 # Snowflake session
 session = Session.builder.configs(st.secrets["snowflake"]).create()
-
 st.success("Connected to Snowflake!")
 
 st.title(f"🥤 Smoothie App - Streamlit {st.__version__}")
 st.write("Create and manage your smoothie orders!")
 
 # Load fruits
-my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON') )
+my_dataframe = session.table("smoothies.public.fruit_options") \
+    .select(col('FRUIT_NAME'), col('SEARCH_ON'))
+
 st.dataframe(data=my_dataframe, use_container_width=True)
-st.stop()
 
-# Convert the snowpark Dataframe to a Pandas so we can use to LOC Function
+# ❌ SUPPRIMÉ : st.stop()
+
+# Convert to pandas
 pd_pf = my_dataframe.to_pandas()
-#st.my_dataframe(pd_pf)
-#st.stop()
 
-
-fruit_rows = my_dataframe.collect()
-fruit_list = [row['FRUIT_NAME'] for row in fruit_rows]
+# Create fruit list
+fruit_list = pd_pf['FRUIT_NAME'].tolist()
 
 # Name input
 name_on_order = st.text_input('Name of Smoothie')
 
-# MULTISELECT (IMPORTANT)
+# Multiselect
 ingredients_list = st.multiselect(
     "What are your favorite fruits?",
     fruit_list,
     max_selections=5
 )
 
-# MULTISELECT (IMPORTANT)
-if ingredients_list:
-    INGREDIENTS_STRING = ''
+# Process selection
+INGREDIENTS_STRING = ''
 
+if ingredients_list:
     for fruit_chosen in ingredients_list:
         INGREDIENTS_STRING += fruit_chosen + ' '
 
-        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
-st.write('The search value for ', fruit_chosen,' is ', search_on, '.')
+        # ✅ FIX variable name + indentation
+        search_on = pd_pf.loc[
+            pd_pf['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'
+        ].iloc[0]
+
+        st.write(f"The search value for {fruit_chosen} is {search_on}")
 
         st.subheader(f"{fruit_chosen} Nutrition Informations")
 
         smoothiefroot_response = requests.get(
-            "https://my.smoothiefroot.com/api/fruit/" + fruit_chosen
+            "https://my.smoothiefroot.com/api/fruit/" + search_on
         )
 
         st.json(smoothiefroot_response.json())
 
-
-
-# INSERT ORDER
+# INSERT
 tim_to_insert = st.button('Submit Order')
 
 if tim_to_insert:
@@ -73,7 +74,7 @@ if tim_to_insert:
     else:
         st.warning("Please enter a name and select at least one fruit.")
 
-# UPDATE SECTION
+# UPDATE
 st.subheader("Update Orders")
 
 orders_df = session.table("smoothies.public.orders").to_pandas()
