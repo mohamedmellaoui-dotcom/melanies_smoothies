@@ -15,7 +15,9 @@ st.title(f"🥤 Smoothie App - Streamlit {st.__version__}")
 st.write("Create and manage your smoothie orders!")
 
 # Load fruits
-my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
+my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON') )
+st.dataframe(data=my_dataframe, use_container_width=True)
+st.stop()
 
 fruit_rows = my_dataframe.collect()
 fruit_list = [row['FRUIT_NAME'] for row in fruit_rows]
