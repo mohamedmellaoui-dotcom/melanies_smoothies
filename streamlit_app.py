@@ -27,15 +27,29 @@ fruit_list = [row['FRUIT_NAME'] for row in fruit_rows]
 name_on_order = st.text_input('Name of Smoothie')
 
 # Multiselect fruits
-ingredients_list = st.multiselect(
-    "What are your favorite fruits?",
-    fruit_list,
-    max_selections=5
-)
+#ingredients_list = st.multiselect(
+#    "What are your favorite fruits?",
+#    fruit_list,
+#    max_selections=5
+#)
 
 # Build ingredients string
-INGREDIENTS_STRING = ' '.join(ingredients_list)
+#INGREDIENTS_STRING = ' '.join(ingredients_list)
 
+#
+if ingredients_list:
+    INGREDIENTS_STRING = ''
+
+    for fruit_chosen in ingredients_list:
+        INGREDIENTS_STRING += INGREDIENTS_STRING + ' '
+        #request
+        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
+        #st.text(smoothiefroot_response.json())
+        sf_sd = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+
+
+
+    
 # Button to insert order
 tim_to_insert = st.button('Submit Order')
 
@@ -81,9 +95,4 @@ if update_button:
 
     st.success("Orders updated!", icon="✅")
 
-# request
-smoothiefroot_response = requests.get(
-    "https://my.smoothiefroot.com/api/fruit/watermelon"
-)
-#st.text(smoothiefroot_response.json())
-sf_sd = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+
