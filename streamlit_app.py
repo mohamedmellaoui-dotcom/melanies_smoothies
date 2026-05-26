@@ -2,6 +2,7 @@
 import streamlit as st
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col, when_matched
+import requests
 
 # Debug (pour vérifier que c'est la bonne version)
 st.write("VERSION FINALE OK")
@@ -79,3 +80,7 @@ if update_button:
     )
 
     st.success("Orders updated!", icon="✅")
+
+# request
+smoothiefroot_response = requests.get("[https://my.smoothiefroot.com/api/fruit/watermelon](https://my.smoothiefroot.com/api/fruit/watermelon)")  
+st.text(smoothiefroot_response)
