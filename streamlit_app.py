@@ -5,8 +5,6 @@ from snowflake.snowpark.functions import col, when_matched
 import requests
 import pandas as pd
 
-st.write("VERSION FINALE OK")
-
 # Snowflake session
 session = Session.builder.configs(st.secrets["snowflake"]).create()
 st.success("Connected to Snowflake!")
@@ -19,8 +17,6 @@ my_dataframe = session.table("smoothies.public.fruit_options") \
     .select(col('FRUIT_NAME'), col('SEARCH_ON'))
 
 st.dataframe(data=my_dataframe, use_container_width=True)
-
-# ❌ SUPPRIMÉ : st.stop()
 
 # Convert to pandas
 pd_pf = my_dataframe.to_pandas()
@@ -54,11 +50,8 @@ if ingredients_list:
 
         st.subheader(f"{fruit_chosen} Nutrition Informations")
 
-        smoothiefroot_response = requests.get(
-            "https://my.smoothiefroot.com/api/fruit/" + search_on
-        )
-
-        st.json(smoothiefroot_response.json())
+        smoothiefroot_response = requests.get(f"https://my.smoothiefroot.com/api/fruit/{search_on]")
+        sf_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
 
 # INSERT
 tim_to_insert = st.button('Submit Order')
