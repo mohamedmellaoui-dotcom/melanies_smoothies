@@ -24,6 +24,13 @@ fruit_list = [row['FRUIT_NAME'] for row in fruit_rows]
 name_on_order = st.text_input('Name of Smoothie')
 
 # MULTISELECT (IMPORTANT)
+ingredients_list = st.multiselect(
+    "What are your favorite fruits?",
+    fruit_list,
+    max_selections=5
+)
+
+# MULTISELECT (IMPORTANT)
 if ingredients_list:
     # Build string
     INGREDIENTS_STRING = ''    
